@@ -1,0 +1,48 @@
+{
+  "id": "case-crimson-cipher",
+  "title": "The Crimson Cipher",
+  "description": "A wealthy art collector was found murdered, and a cryptic cipher was left at the scene. Connect the clues to find the killer.",
+  "startingClues": ["clue-1", "clue-2"],
+  "clues": {
+    "clue-1": {
+      "id": "clue-1",
+      "type": "document",
+      "title": "Police Report",
+      "content": "Victim: Lord Harrington. Found dead in his study at 11:00 PM. A window was broken from the inside. A red cipher was written on the wall in blood: 'THE RAVEN FLIES AT MIDNIGHT'.",
+      "image": null
+    },
+    "clue-2": {
+      "id": "clue-2",
+      "type": "suspect",
+      "title": "Suspect: Arthur Penhaligon",
+      "content": "Harrington's nephew. Claims he was at the theater until midnight. Needs verification.",
+      "image": null
+    },
+    "clue-3": {
+      "id": "clue-3",
+      "type": "evidence",
+      "title": "Theater Ticket",
+      "content": "A torn theater ticket for 'The Raven', stamped at 10:30 PM. Found in Arthur's coat.",
+      "image": null
+    },
+    "clue-4": {
+      "id": "clue-4",
+      "type": "deduction",
+      "title": "The Nephew's Lie",
+      "content": "Arthur claims he was at the theater until midnight, but 'The Raven' is the cipher. The ticket proves he was there, but it connects him to the message.",
+      "image": null
+    }
+  },
+  "combinations": [
+    {
+      "requires": ["clue-1", "clue-2"],
+      "unlocks": "clue-3",
+      "message": "You decided to search Arthur's coat after reading the police report."
+    },
+    {
+      "requires": ["clue-1", "clue-3"],
+      "unlocks": "clue-4",
+      "message": "Aha! 'The Raven' is the play Arthur attended. He must be connected to the cipher!"
+    }
+  ]
+}

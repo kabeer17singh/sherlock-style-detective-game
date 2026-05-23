@@ -1,0 +1,14 @@
+{
+  "name": "sherlock-style-detective-game",
+  "version": "1.0.0",
+  "description": "Multiplayer detective game",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend"
+  }
+}
