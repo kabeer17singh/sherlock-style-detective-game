@@ -1,0 +1,115 @@
+{
+  "id": "case-midnight-telegram",
+  "title": "Midnight Telegram",
+  "description": "A coded telegram preceded a diplomat's poisoning. Decode the message and catch the sender before they sail at dawn.",
+  "maxLeads": 6,
+  "intro": "A sealed envelope arrived at 11:47 PM. By midnight, Ambassador Cross was dead.",
+  "startingClues": ["clue-1", "clue-2"],
+  "locations": [
+    {
+      "id": "desk",
+      "name": "Ambassador's Desk",
+      "action": "Search correspondence",
+      "clueId": "clue-3"
+    },
+    {
+      "id": "dock",
+      "name": "Harbor Dock",
+      "action": "Interview dockhands",
+      "clueId": "clue-5"
+    }
+  ],
+  "clues": {
+    "clue-1": {
+      "id": "clue-1",
+      "type": "document",
+      "title": "Autopsy Summary",
+      "content": "Ambassador Cross died of cyanide at roughly 12:05 AM. A crumpled telegram was in his hand: 'QEB RFYN GBTBX' (Caesar cipher, shift unknown)."
+    },
+    "clue-2": {
+      "id": "clue-2",
+      "type": "suspect",
+      "title": "Suspect: Victor Hale",
+      "content": "Trade attaché. Argued with Cross over shipping tariffs yesterday. Booked passage on the morning steamer."
+    },
+    "clue-3": {
+      "id": "clue-3",
+      "type": "evidence",
+      "title": "Cipher Scratch Pad",
+      "content": "Cross's notes test shifts on paper. Shift 3 yields: 'NBY OCVL YEQOU' — nonsense. Shift 1 is circled twice."
+    },
+    "clue-4": {
+      "id": "clue-4",
+      "type": "deduction",
+      "title": "Decoded Warning",
+      "content": "Applying Caesar shift 1 to the ciphertext yields: 'THE DEAD WALKS AT DAWN' — a threat timed for the ambassador's last morning."
+    },
+    "clue-5": {
+      "id": "clue-5",
+      "type": "evidence",
+      "title": "Dock Manifest",
+      "content": "Victor Hale's cabin trunk contains cyanide vials hidden in a false bottom. Ticket shows steamer departure 6 AM."
+    },
+    "clue-6": {
+      "id": "clue-6",
+      "type": "deduction",
+      "title": "Sender Identified",
+      "content": "Hale sent the coded warning after poisoning Cross, planning to flee at dawn. The cipher was meant to taunt, not save."
+    }
+  },
+  "combinations": [
+    {
+      "requires": ["clue-1", "clue-3"],
+      "unlocks": "clue-4",
+      "message": "Shift 1 reveals the threat hidden in the telegram.",
+      "challenge": {
+        "prompt": "What does the telegram say (Caesar shift 1)?",
+        "options": [
+          { "id": "a", "text": "THE DEAD WALKS AT DAWN", "correct": true },
+          { "id": "b", "text": "MEET AT THE HARBOR TONIGHT", "correct": false },
+          { "id": "c", "text": "THE AMBASSADOR LIVES", "correct": false }
+        ]
+      }
+    },
+    {
+      "requires": ["clue-4", "clue-5"],
+      "unlocks": "clue-6",
+      "message": "Poison, coded threat, and dawn escape point to one attaché.",
+      "challenge": {
+        "prompt": "Who sent the telegram and poisoned Cross?",
+        "options": [
+          { "id": "a", "text": "Victor Hale — cyanide in his trunk, steamer at dawn", "correct": true },
+          { "id": "b", "text": "The harbor master who logged the ship", "correct": false },
+          { "id": "c", "text": "Cross himself in a suicide note", "correct": false }
+        ]
+      }
+    }
+  ],
+  "suspects": [
+    {
+      "id": "suspect-victor",
+      "name": "Victor Hale",
+      "role": "Trade attaché",
+      "detail": "Argument yesterday; steamer ticket; trunk searched at dock."
+    },
+    {
+      "id": "suspect-clerk",
+      "name": "Ada Whitmore",
+      "role": "Telegraph clerk",
+      "detail": "Transmitted the message. Claims she cannot read ciphers."
+    },
+    {
+      "id": "suspect-butler",
+      "name": "James Poole",
+      "role": "Ambassador's butler",
+      "detail": "Delivered the telegram. No cyanide found on his person."
+    }
+  ],
+  "solution": {
+    "culpritId": "suspect-victor",
+    "requiredClues": ["clue-1", "clue-2", "clue-3", "clue-4", "clue-5", "clue-6"],
+    "evidenceClues": ["clue-4", "clue-5"],
+    "explanation": "Victor Hale poisoned Ambassador Cross, sent a Caesar-shift taunt, and planned to escape on the dawn steamer—stopped by the cyanide found in his trunk.",
+    "redHerringNote": "Ada transmitted the message but had no access to Cross's study or the poison."
+  }
+}

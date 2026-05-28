@@ -1,0 +1,115 @@
+{
+  "id": "case-locked-ledger",
+  "title": "The Locked Ledger",
+  "description": "A banker vanished after his vault showed impossible numbers. Follow the timeline before the trail goes cold.",
+  "maxLeads": 6,
+  "intro": "The Whitmore Trust vault was opened at 2 AM—by someone who should have been miles away.",
+  "startingClues": ["clue-1", "clue-2"],
+  "locations": [
+    {
+      "id": "vault",
+      "name": "Bank Vault",
+      "action": "Inspect the ledger",
+      "clueId": "clue-3"
+    },
+    {
+      "id": "station",
+      "name": "Railway Station",
+      "action": "Check departure logs",
+      "clueId": "clue-5"
+    }
+  ],
+  "clues": {
+    "clue-1": {
+      "id": "clue-1",
+      "type": "document",
+      "title": "Incident Report",
+      "content": "Vault opened 2:14 AM. £20,000 missing. Security log shows only one key used—assigned to clerk Horace Bell."
+    },
+    "clue-2": {
+      "id": "clue-2",
+      "type": "suspect",
+      "title": "Suspect: Margaret Ashford",
+      "content": "Senior accountant. Claims she left the building at 6 PM. Her coat was still on her chair at 8 PM per the night guard."
+    },
+    "clue-3": {
+      "id": "clue-3",
+      "type": "evidence",
+      "title": "Altered Ledger Page",
+      "content": "Page 47 shows withdrawals re-dated. Ink is fresh; the bank closed at 5 PM. Someone worked after hours."
+    },
+    "clue-4": {
+      "id": "clue-4",
+      "type": "deduction",
+      "title": "Timeline Gap",
+      "content": "Margaret's coat at 8 PM contradicts her 6 PM exit. She was in the building when the ledger was altered."
+    },
+    "clue-5": {
+      "id": "clue-5",
+      "type": "evidence",
+      "title": "Railway Manifest",
+      "content": "A ticket to Dover was purchased at 2:40 AM under the name 'H. Bell'—but Horace Bell was hospitalized since noon."
+    },
+    "clue-6": {
+      "id": "clue-6",
+      "type": "deduction",
+      "title": "Forged Identity",
+      "content": "Margaret used Bell's name at the station while Bell had an alibi. She had vault access and motive to embezzle."
+    }
+  },
+  "combinations": [
+    {
+      "requires": ["clue-1", "clue-3"],
+      "unlocks": "clue-4",
+      "message": "Fresh ink means the books were cooked after closing.",
+      "challenge": {
+        "prompt": "Who could have altered the ledger?",
+        "options": [
+          { "id": "a", "text": "Someone still in the building after 6 PM", "correct": true },
+          { "id": "b", "text": "Horace Bell from his hospital bed", "correct": false },
+          { "id": "c", "text": "A random burglar with no key", "correct": false }
+        ]
+      }
+    },
+    {
+      "requires": ["clue-4", "clue-5"],
+      "unlocks": "clue-6",
+      "message": "The false name ties the accountant to the escape route.",
+      "challenge": {
+        "prompt": "What proves Margaret is the thief?",
+        "options": [
+          { "id": "a", "text": "She was present after hours and used Bell's name on the manifest", "correct": true },
+          { "id": "b", "text": "Bell's key was stolen by an unknown party", "correct": false },
+          { "id": "c", "text": "The night guard opened the vault", "correct": false }
+        ]
+      }
+    }
+  ],
+  "suspects": [
+    {
+      "id": "suspect-margaret",
+      "name": "Margaret Ashford",
+      "role": "Senior accountant",
+      "detail": "Coat left behind; access to ledgers and vault procedures."
+    },
+    {
+      "id": "suspect-horace",
+      "name": "Horace Bell",
+      "role": "Vault clerk",
+      "detail": "Key holder, but hospitalized before the theft."
+    },
+    {
+      "id": "suspect-guard",
+      "name": "Silas Croft",
+      "role": "Night guard",
+      "detail": "Logged Margaret's coat at 8 PM. Denies entering the vault."
+    }
+  ],
+  "solution": {
+    "culpritId": "suspect-margaret",
+    "requiredClues": ["clue-1", "clue-2", "clue-3", "clue-4", "clue-5", "clue-6"],
+    "evidenceClues": ["clue-3", "clue-5"],
+    "explanation": "Margaret Ashford stayed after hours, altered the ledger, stole £20,000, and fled using Horace Bell's name while he was hospitalized.",
+    "redHerringNote": "Horace held the vault key, but hospital records place him away from the bank when the theft occurred."
+  }
+}

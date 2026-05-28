@@ -583,3 +583,292 @@ button.secondary:hover {
 .clue-card {
   z-index: 2;
 }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+  padding: 1rem;
+}
+
+.modal {
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.deduction-modal .deduction-prompt {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+}
+
+.deduction-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.deduction-option {
+  text-align: left;
+  padding: 0.75rem !important;
+  font-size: 0.9rem !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-light) !important;
+}
+
+.deduction-option.selected {
+  border-color: var(--color-accent) !important;
+  background: rgba(139, 0, 0, 0.25) !important;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.modal-actions button {
+  flex: 1;
+  min-width: 100px;
+  padding: 0.65rem !important;
+  font-size: 0.95rem !important;
+}
+
+.vote-status {
+  background: rgba(201, 162, 39, 0.15);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.hint-box {
+  background: rgba(45, 90, 39, 0.3);
+  border: 1px solid #2d5a27;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.lead-panel .leads-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leads-count {
+  font-size: 0.9rem;
+  color: #c9a227;
+  font-weight: bold;
+}
+
+.leads-count.empty {
+  color: #f88;
+}
+
+.location-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.location-btn {
+  text-align: left;
+  padding: 0.6rem !important;
+  font-size: 0.85rem !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-light) !important;
+}
+
+.location-btn strong {
+  display: block;
+  font-family: var(--font-title);
+}
+
+.location-btn span {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.location-btn.done {
+  opacity: 0.5;
+}
+
+.connection-line.ready {
+  stroke: rgba(201, 162, 39, 0.8);
+  stroke-width: 3;
+  stroke-dasharray: none;
+}
+
+.deduction-alert-btn {
+  width: 100%;
+  animation: pulse 1.5s infinite;
+  background: #c9a227 !important;
+  color: #1a1816 !important;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.status-banner {
+  background: rgba(139, 0, 0, 0.3);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.intro-modal .intro-text {
+  font-style: italic;
+  line-height: 1.6;
+  color: #ddd;
+}
+
+.case-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.case-pick {
+  text-align: left;
+  padding: 0.65rem !important;
+  font-size: 0.9rem !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-light) !important;
+}
+
+.case-pick.selected {
+  border-color: #c9a227 !important;
+}
+
+.case-pick span {
+  display: block;
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 0.2rem;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mode-toggle button {
+  flex: 1;
+  padding: 0.65rem !important;
+  font-size: 1rem !important;
+}
+
+.mode-toggle button.selected {
+  background: var(--color-accent);
+  border: none;
+}
+
+.share-block {
+  text-align: center;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.room-qr {
+  margin-top: 0.5rem;
+  border-radius: 4px;
+}
+
+.scores-list {
+  font-size: 0.85rem;
+  color: #ccc;
+  padding-left: 1.2rem;
+}
+
+.evidence-pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.evidence-pick {
+  text-align: left;
+  padding: 0.5rem !important;
+  font-size: 0.85rem !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-light) !important;
+}
+
+.evidence-pick.selected {
+  border-color: var(--color-accent) !important;
+  background: rgba(139, 0, 0, 0.2) !important;
+}
+
+.debrief-card {
+  max-width: 520px;
+}
+
+.grade-badge {
+  font-size: 3rem;
+  font-family: var(--font-title);
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.grade-S { color: #c9a227; }
+.grade-A { color: #8fbc8f; }
+.grade-B { color: #87ceeb; }
+.grade-C { color: #ccc; }
+.grade-F { color: #f88; }
+
+.score-points {
+  font-size: 1.25rem;
+  color: #c9a227;
+}
+
+.debrief-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #aaa;
+  margin: 1rem 0;
+}
+
+.red-herring-box {
+  background: rgba(139, 0, 0, 0.15);
+  border: 1px solid var(--color-border);
+  padding: 0.75rem;
+  margin: 1rem 0;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.missed-clues {
+  text-align: left;
+  font-size: 0.85rem;
+  color: #bbb;
+}
+
+.how-to-steps {
+  text-align: left;
+  line-height: 1.6;
+  padding-left: 1.25rem;
+}
+
+.how-to-steps li {
+  margin-bottom: 0.75rem;
+}

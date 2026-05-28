@@ -1,8 +1,24 @@
 {
   "id": "case-crimson-cipher",
   "title": "The Crimson Cipher",
-  "description": "Lord Harrington lies dead in his study, a bloody cipher on the wall. Work with your partner to link evidence on the board and unmask the killer before they slip away.",
+  "description": "Lord Harrington lies dead in his study. Spend leads wisely, link evidence on the board, and prove who wrote the bloody cipher.",
+  "maxLeads": 7,
+  "intro": "October 1889. The Harrington manor is sealed. Scotland Yard wants answers before dawn.",
   "startingClues": ["clue-1", "clue-2"],
+  "locations": [
+    {
+      "id": "theater",
+      "name": "Grand Theater",
+      "action": "Verify Arthur's alibi",
+      "clueId": "clue-3"
+    },
+    {
+      "id": "office",
+      "name": "Family Office",
+      "action": "Audit the ledgers",
+      "clueId": "clue-5"
+    }
+  ],
   "clues": {
     "clue-1": {
       "id": "clue-1",
@@ -43,24 +59,30 @@
   },
   "combinations": [
     {
-      "requires": ["clue-1", "clue-2"],
-      "unlocks": "clue-3",
-      "message": "You cross-reference Arthur's alibi with the crime scene and search his coat."
-    },
-    {
       "requires": ["clue-1", "clue-3"],
       "unlocks": "clue-4",
-      "message": "The play title matches the cipher. Arthur is no mere witness."
+      "message": "The play title matches the cipher. Arthur is no mere witness.",
+      "challenge": {
+        "prompt": "What links the cipher to Arthur?",
+        "options": [
+          { "id": "a", "text": "'The Raven' is the play on his ticket stub", "correct": true },
+          { "id": "b", "text": "The housekeeper's keys match the broken latch", "correct": false },
+          { "id": "c", "text": "The doctor altered the time of death", "correct": false }
+        ]
+      }
     },
     {
       "requires": ["clue-2", "clue-4"],
-      "unlocks": "clue-5",
-      "message": "Digging into family finances reveals crushing debts."
-    },
-    {
-      "requires": ["clue-4", "clue-5"],
       "unlocks": "clue-6",
-      "message": "Motive and opportunity align. Time to make an accusation."
+      "message": "Motive and opportunity align. Time to make an accusation.",
+      "challenge": {
+        "prompt": "Why is Arthur the prime suspect?",
+        "options": [
+          { "id": "a", "text": "Debt, cipher link, and trusted access to the house", "correct": true },
+          { "id": "b", "text": "Elena argued with the lord at 10 PM", "correct": false },
+          { "id": "c", "text": "Dr. Crane signed the certificate too quickly", "correct": false }
+        ]
+      }
     }
   ],
   "suspects": [
@@ -86,6 +108,8 @@
   "solution": {
     "culpritId": "suspect-arthur",
     "requiredClues": ["clue-1", "clue-2", "clue-3", "clue-4", "clue-5", "clue-6"],
-    "explanation": "Arthur Penhaligon forged a theater alibi while leaving the cipher from 'The Raven'. Crushing debt gave him motive; his familiarity with the house explains the inside latch."
+    "evidenceClues": ["clue-3", "clue-5"],
+    "explanation": "Arthur Penhaligon forged a theater alibi while leaving the cipher from 'The Raven'. Crushing debt gave him motive; his familiarity with the house explains the inside latch.",
+    "redHerringNote": "Elena had keys and argued with the lord, but the cipher points to the play Arthur attended—not the servants' quarters."
   }
 }
