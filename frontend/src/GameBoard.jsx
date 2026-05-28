@@ -1,180 +1,390 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { io } from 'socket.io-client';
+import { API_BASE, SOCKET_URL } from './config';
+import DiscoveryToast from './components/DiscoveryToast';
+import AccusationPanel from './components/AccusationPanel';
+
+const COMBO_DISTANCE = 120;
+
+function pairKey(a, b) {
+  return [a, b].sort().join('|');
+}
+
+function getConnectionPairs(boardData) {
+  const pairs = [];
+  for (let i = 0; i < boardData.length; i++) {
+    for (let j = i + 1; j < boardData.length; j++) {
+      const c1 = boardData[i];
+      const c2 = boardData[j];
+      const dist = Math.hypot(c1.x - c2.x, c1.y - c2.y);
+      if (dist < COMBO_DISTANCE) {
+        pairs.push({ c1, c2, dist });
+      }
+    }
+  }
+  return pairs;
+}
 
 export default function GameBoard({ user, room, onLeave }) {
   const [socket, setSocket] = useState(null);
+  const [caseData, setCaseData] = useState(null);
   const [boardData, setBoardData] = useState([]);
   const [unlockedClues, setUnlockedClues] = useState([]);
   const [draggingClue, setDraggingClue] = useState(null);
-  
-  // Hardcoded case data for client (in a real app, fetch this via API)
-  const caseData = {
-    "clue-1": { title: "Police Report", content: "Victim: Lord Harrington. Found dead in his study at 11:00 PM. A window was broken from the inside. A red cipher was written on the wall in blood: 'THE RAVEN FLIES AT MIDNIGHT'." },
-    "clue-2": { title: "Suspect: Arthur Penhaligon", content: "Harrington's nephew. Claims he was at the theater until midnight. Needs verification." },
-    "clue-3": { title: "Theater Ticket", content: "A torn theater ticket for 'The Raven', stamped at 10:30 PM. Found in Arthur's coat." },
-    "clue-4": { title: "The Nephew's Lie", content: "Arthur claims he was at the theater until midnight, but 'The Raven' is the cipher. The ticket proves he was there, but it connects him to the message." }
-  };
-  
-  const combinations = [
-    { requires: ["clue-1", "clue-2"], unlocks: "clue-3", message: "You searched Arthur's coat after reading the police report." },
-    { requires: ["clue-1", "clue-3"], unlocks: "clue-4", message: "Aha! 'The Raven' connects Arthur to the cipher!" }
-  ];
+  const [players, setPlayers] = useState([]);
+  const [discoveries, setDiscoveries] = useState([]);
+  const [gamePhase, setGamePhase] = useState('investigation');
+  const [accusationResult, setAccusationResult] = useState(null);
+  const [notes, setNotes] = useState([]);
+  const [noteText, setNoteText] = useState('');
+  const [loadError, setLoadError] = useState('');
+  const [accuseDisabled, setAccuseDisabled] = useState(false);
 
   const boardRef = useRef(null);
 
-  useEffect(() => {
-    // Fetch initial state
-    fetch(`http://localhost:3001/api/rooms/${room.roomCode}`)
-      .then(res => res.json())
-      .then(data => {
-        setBoardData(data.boardData || []);
-        setUnlockedClues(data.unlockedClues || []);
-      });
+  const clues = caseData?.clues || {};
+  const totalClues = caseData ? Object.keys(caseData.clues).length : 0;
+  const progress = totalClues ? Math.round((unlockedClues.length / totalClues) * 100) : 0;
 
-    // Setup WebSocket
-    const newSocket = io('http://localhost:3001');
+  const canAccuse = useMemo(() => {
+    if (!caseData?.solution?.requiredClues) return false;
+    return caseData.solution.requiredClues.every((id) => unlockedClues.includes(id));
+  }, [caseData, unlockedClues]);
+
+  const connectionPairs = useMemo(() => getConnectionPairs(boardData), [boardData]);
+
+  const pushDiscovery = useCallback((payload) => {
+    setDiscoveries((d) => {
+      if (d.some((item) => item.message === payload.message && item.title === payload.title)) {
+        return d;
+      }
+      return [
+        ...d,
+        {
+          id: `${payload.unlocks}-${Date.now()}`,
+          title: payload.title,
+          message: payload.message,
+          by: payload.by,
+        },
+      ];
+    });
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const [roomRes, caseRes] = await Promise.all([
+          fetch(`${API_BASE}/api/rooms/${room.roomCode}`),
+          fetch(`${API_BASE}/api/cases/${room.caseId}`),
+        ]);
+        const roomJson = await roomRes.json();
+        const caseJson = await caseRes.json();
+        if (!roomRes.ok) throw new Error(roomJson.error || 'Room not found');
+        if (!caseRes.ok) throw new Error(caseJson.error || 'Case not found');
+        if (cancelled) return;
+
+        setCaseData(caseJson);
+        setBoardData(roomJson.boardData || []);
+        setUnlockedClues(roomJson.unlockedClues || []);
+        setGamePhase(roomJson.gamePhase || 'investigation');
+        setAccusationResult(roomJson.accusationResult || null);
+      } catch (e) {
+        setLoadError(e.message || 'Failed to load investigation');
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [room.roomCode, room.caseId]);
+
+  useEffect(() => {
+    const newSocket = io(SOCKET_URL, { path: '/socket.io' });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
-      newSocket.emit('join_room', room.roomCode);
+      newSocket.emit('join_room', {
+        roomCode: room.roomCode,
+        username: user.username,
+        userId: user.id,
+      });
     });
 
-    newSocket.on('board_updated', (newBoardData) => {
-      setBoardData(newBoardData);
+    newSocket.on('board_updated', setBoardData);
+    newSocket.on('clues_unlocked', setUnlockedClues);
+    newSocket.on('players_updated', setPlayers);
+    newSocket.on('discovery_made', pushDiscovery);
+    newSocket.on('note_added', (note) => setNotes((n) => [...n.slice(-19), note]));
+    newSocket.on('accusation_result', (result) => {
+      setAccusationResult(result);
+      setGamePhase('solved');
+      setAccuseDisabled(false);
     });
-
-    newSocket.on('clues_unlocked', (newUnlockedClues) => {
-      setUnlockedClues(newUnlockedClues);
+    newSocket.on('accusation_rejected', (data) => {
+      alert(data.reason);
+      setAccuseDisabled(false);
     });
 
     return () => newSocket.close();
-  }, [room.roomCode]);
+  }, [room.roomCode, user.username, user.id, pushDiscovery]);
 
-  const updateBoardAndEmit = (newBoard) => {
+  const emitBoardUpdate = (newBoard) => {
     setBoardData(newBoard);
-    socket.emit('update_board', { roomCode: room.roomCode, roomId: room.roomId, boardData: newBoard });
+    if (!socket?.connected) return;
+    socket.emit('update_board', {
+      roomCode: room.roomCode,
+      roomId: room.roomId,
+      boardData: newBoard,
+      caseId: room.caseId,
+    });
   };
 
-  const unlockCluesAndEmit = (newUnlocked) => {
-    setUnlockedClues(newUnlocked);
-    socket.emit('unlock_clues', { roomCode: room.roomCode, roomId: room.roomId, unlockedClues: newUnlocked });
-  };
-
-  // Drag and Drop Handlers
   const handleDragStart = (e, clueId, isFromInventory) => {
+    if (gamePhase === 'solved') return;
     setDraggingClue({ id: clueId, isFromInventory });
-    // This is required for Firefox
     e.dataTransfer.setData('text/plain', clueId);
   };
 
   const handleDragOver = (e) => {
-    e.preventDefault(); // allow drop
+    e.preventDefault();
   };
 
   const handleDropOnBoard = (e) => {
     e.preventDefault();
-    if (!draggingClue) return;
+    if (!draggingClue || gamePhase === 'solved') return;
 
     const boardRect = boardRef.current.getBoundingClientRect();
-    const x = e.clientX - boardRect.left;
-    const y = e.clientY - boardRect.top;
+    const x = Math.max(0, e.clientX - boardRect.left - 100);
+    const y = Math.max(0, e.clientY - boardRect.top - 40);
 
     let newBoard = [...boardData];
-    
     if (draggingClue.isFromInventory) {
-      // Add to board
-      newBoard.push({ id: draggingClue.id, x, y });
+      const existing = newBoard.find((c) => c.id === draggingClue.id);
+      if (existing) {
+        newBoard = newBoard.map((c) =>
+          c.id === draggingClue.id ? { ...c, x, y } : c
+        );
+      } else {
+        newBoard.push({ id: draggingClue.id, x, y });
+      }
     } else {
-      // Move existing clue
-      newBoard = newBoard.map(clue => 
-        clue.id === draggingClue.id ? { ...clue, x, y } : clue
+      newBoard = newBoard.map((c) =>
+        c.id === draggingClue.id ? { ...c, x, y } : c
       );
     }
 
-    updateBoardAndEmit(newBoard);
-    checkCombinations(newBoard);
+    emitBoardUpdate(newBoard);
     setDraggingClue(null);
   };
 
-  const checkCombinations = (currentBoard) => {
-    // Very simple distance check: if two clues are close, combine them
-    const distanceThreshold = 50; 
-    
-    for (let i = 0; i < currentBoard.length; i++) {
-      for (let j = i + 1; j < currentBoard.length; j++) {
-        const c1 = currentBoard[i];
-        const c2 = currentBoard[j];
-        
-        const dist = Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
-        if (dist < distanceThreshold) {
-          // Check if this pair unlocks anything
-          const combo = combinations.find(c => 
-            c.requires.includes(c1.id) && c.requires.includes(c2.id) && !unlockedClues.includes(c.unlocks)
-          );
-          
-          if (combo) {
-            alert(combo.message + "\n\nNew Clue Unlocked!");
-            unlockCluesAndEmit([...unlockedClues, combo.unlocks]);
-          }
-        }
-      }
-    }
+  const handleAddNote = (e) => {
+    e.preventDefault();
+    const text = noteText.trim();
+    if (!text || !socket?.connected) return;
+    socket.emit('add_note', { roomCode: room.roomCode, note: { text } });
+    setNoteText('');
   };
+
+  const handleAccuse = (suspectId) => {
+    if (!socket?.connected) return;
+    setAccuseDisabled(true);
+    socket.emit('make_accusation', {
+      roomCode: room.roomCode,
+      roomId: room.roomId,
+      caseId: room.caseId,
+      suspectId,
+    });
+  };
+
+  const dismissToast = (id) => {
+    setDiscoveries((d) => d.filter((t) => t.id !== id));
+  };
+
+  if (loadError) {
+    return (
+      <div className="lobby-container">
+        <div className="panel auth-form">
+          <p style={{ color: '#f88' }}>{loadError}</p>
+          <button type="button" onClick={onLeave}>
+            Return to Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!caseData) {
+    return (
+      <div className="lobby-container">
+        <div className="panel auth-form">
+          <p>Opening case file...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="game-container">
-      {/* Sidebar: Case File & Inventory */}
-      <div className="sidebar">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>Room: {room.roomCode}</h2>
-          <button className="secondary" onClick={onLeave} style={{ padding: '0.4rem', fontSize: '0.9rem' }}>Leave</button>
+      <DiscoveryToast discoveries={discoveries} onDismiss={dismissToast} />
+
+      {gamePhase === 'solved' && accusationResult && (
+        <div className={`verdict-overlay ${accusationResult.correct ? 'win' : 'lose'}`}>
+          <div className="verdict-card panel">
+            <h2>{accusationResult.correct ? 'Case Closed' : 'Wrong Suspect'}</h2>
+            <p>
+              {accusationResult.correct
+                ? `${accusationResult.by} identified ${accusationResult.culpritName} as the killer.`
+                : `The real culprit was ${accusationResult.culpritName}.`}
+            </p>
+            <p className="verdict-explanation">{accusationResult.explanation}</p>
+            <button type="button" onClick={onLeave}>
+              Return to Lobby
+            </button>
+          </div>
         </div>
-        <p>Drag clues from the file onto the evidence board to organize and connect them.</p>
-        
-        <div style={{ borderTop: '1px solid var(--color-border)', margin: '1rem 0' }}></div>
-        
-        <h3>Case File</h3>
-        {unlockedClues.map(clueId => {
-          const clue = caseData[clueId];
-          const isOnBoard = boardData.some(c => c.id === clueId);
-          if (!clue || isOnBoard) return null; // Don't show if it's already on the board
+      )}
+
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <div>
+            <h2>{caseData.title}</h2>
+            <span className="room-code">Room {room.roomCode}</span>
+          </div>
+          <button type="button" className="secondary leave-btn" onClick={onLeave}>
+            Leave
+          </button>
+        </div>
+
+        <p className="sidebar-intro">{caseData.description}</p>
+
+        <div className="progress-block">
+          <div className="progress-label">
+            <span>Evidence gathered</span>
+            <span>
+              {unlockedClues.length}/{totalClues}
+            </span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+
+        <div className="players-block">
+          <h4>Detectives in office</h4>
+          <ul>
+            {players.length === 0 && <li>{user.username} (you)</li>}
+            {players.map((p) => (
+              <li key={p.id}>
+                {p.username}
+                {p.username === user.username ? ' (you)' : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="divider" />
+
+        <h3>Case file</h3>
+        <p className="hint">Drag clues onto the corkboard. Place related cards close together to deduce new evidence.</p>
+
+        {unlockedClues.map((clueId) => {
+          const clue = clues[clueId];
+          const isOnBoard = boardData.some((c) => c.id === clueId);
+          if (!clue || isOnBoard) return null;
 
           return (
-            <div 
+            <div
               key={clueId}
-              className="clue-card inventory"
-              draggable
+              className={`clue-card inventory type-${clue.type}`}
+              draggable={gamePhase !== 'solved'}
               onDragStart={(e) => handleDragStart(e, clueId, true)}
             >
+              <span className="clue-type">{clue.type}</span>
               <div className="clue-title">{clue.title}</div>
-              <div className="clue-content" style={{ maxHeight: '60px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {clue.content}
-              </div>
+              <div className="clue-content clipped">{clue.content}</div>
             </div>
           );
         })}
-      </div>
 
-      {/* Main Evidence Board */}
-      <div 
-        className="board" 
+        <div className="divider" />
+
+        <AccusationPanel
+          suspects={caseData.suspects || []}
+          canAccuse={canAccuse}
+          gamePhase={gamePhase}
+          onAccuse={handleAccuse}
+          disabled={accuseDisabled}
+        />
+
+        <div className="divider" />
+
+        <h3>Shared notes</h3>
+        <form className="note-form" onSubmit={handleAddNote}>
+          <input
+            type="text"
+            placeholder="Leave a note for your partner..."
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            disabled={gamePhase === 'solved'}
+          />
+          <button type="submit" className="secondary" disabled={gamePhase === 'solved'}>
+            Pin note
+          </button>
+        </form>
+        <div className="notes-feed">
+          {notes.length === 0 && <p className="hint">No notes yet. Coordinate your theory here.</p>}
+          {notes.map((n) => (
+            <div key={n.at} className="note-item">
+              <strong>{n.by}</strong>
+              <p>{n.text}</p>
+            </div>
+          ))}
+        </div>
+      </aside>
+
+      <div
+        className="board"
         ref={boardRef}
         onDragOver={handleDragOver}
         onDrop={handleDropOnBoard}
       >
-        {boardData.map(cluePos => {
-          const clue = caseData[cluePos.id];
+        <svg className="connection-layer">
+          {connectionPairs.map(({ c1, c2 }) => (
+            <line
+              key={pairKey(c1.id, c2.id)}
+              x1={c1.x + 100}
+              y1={c1.y + 60}
+              x2={c2.x + 100}
+              y2={c2.y + 60}
+              className="connection-line"
+            />
+          ))}
+        </svg>
+
+        {boardData.length === 0 && (
+          <div className="board-hint">
+            <h3>Evidence Board</h3>
+            <p>Drag clues from the case file. When two related clues sit near each other, you may uncover new evidence.</p>
+          </div>
+        )}
+
+        {boardData.map((cluePos) => {
+          const clue = clues[cluePos.id];
           if (!clue) return null;
-          
+
           return (
-            <div 
+            <div
               key={cluePos.id}
-              className="clue-card"
+              className={`clue-card type-${clue.type}`}
               style={{ left: cluePos.x, top: cluePos.y }}
-              draggable
+              draggable={gamePhase !== 'solved'}
               onDragStart={(e) => handleDragStart(e, cluePos.id, false)}
             >
-              <div className="pin"></div>
+              <div className="pin" />
+              <span className="clue-type">{clue.type}</span>
               <div className="clue-title">{clue.title}</div>
               <div className="clue-content">{clue.content}</div>
             </div>

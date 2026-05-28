@@ -4,7 +4,6 @@ const path = require('path');
 const dbPath = path.resolve(__dirname, 'database.sqlite');
 const db = new sqlite3.Database(dbPath);
 
-// Initialize Database Schema
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -26,9 +25,16 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS room_state (
       room_id TEXT PRIMARY KEY,
       board_data TEXT,
-      unlocked_clues TEXT
+      unlocked_clues TEXT,
+      game_phase TEXT DEFAULT 'investigation',
+      winner TEXT,
+      accusation_result TEXT
     )
   `);
+
+  db.run(`ALTER TABLE room_state ADD COLUMN game_phase TEXT DEFAULT 'investigation'`, () => {});
+  db.run(`ALTER TABLE room_state ADD COLUMN winner TEXT`, () => {});
+  db.run(`ALTER TABLE room_state ADD COLUMN accusation_result TEXT`, () => {});
 });
 
 module.exports = db;

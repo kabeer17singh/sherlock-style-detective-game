@@ -189,3 +189,397 @@ button.secondary:hover {
   transform: translateX(-50%);
   box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3), 2px 2px 2px rgba(0,0,0,0.2);
 }
+
+.hint {
+  font-size: 0.85rem;
+  color: #b8a99a;
+  line-height: 1.45;
+}
+
+.error-banner {
+  background: rgba(139, 0, 0, 0.25);
+  border: 1px solid var(--color-accent);
+  padding: 0.75rem;
+  border-radius: 4px;
+  color: #ffb4b4;
+}
+
+.divider {
+  border-top: 1px solid var(--color-border);
+  margin: 1rem 0;
+}
+
+.or-divider {
+  text-align: center;
+  position: relative;
+}
+
+.or-divider span {
+  background: rgba(44, 36, 27, 1);
+  padding: 0 0.75rem;
+  position: relative;
+  top: -0.7rem;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.lobby-panel {
+  max-width: 520px;
+}
+
+.lobby-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.lobby-sub {
+  margin: 0.25rem 0 0;
+  color: #b8a99a;
+  font-size: 0.9rem;
+}
+
+.case-brief {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.panel-inner {
+  border: 1px dashed var(--color-border);
+}
+
+.case-meta {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #c9a227;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.join-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.join-form input {
+  flex: 1;
+}
+
+.lobby-tips {
+  margin: 1.25rem 0 0;
+  padding-left: 1.2rem;
+  color: #b8a99a;
+  font-size: 0.85rem;
+}
+
+.lobby-tips li {
+  margin-bottom: 0.4rem;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.room-code {
+  font-size: 0.8rem;
+  color: #c9a227;
+  letter-spacing: 0.08em;
+}
+
+.leave-btn {
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.85rem !important;
+}
+
+.sidebar-intro {
+  font-size: 0.9rem;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.progress-block {
+  margin-top: 0.5rem;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+  color: #b8a99a;
+}
+
+.progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b0000, #c9a227);
+  transition: width 0.4s ease;
+}
+
+.players-block h4 {
+  margin: 0.5rem 0 0.35rem;
+  font-size: 0.9rem;
+}
+
+.players-block ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+  color: #ddd;
+}
+
+.clue-type {
+  display: inline-block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8b0000;
+  margin-bottom: 0.35rem;
+}
+
+.clue-card.type-suspect {
+  border-left: 3px solid #4a5568;
+}
+
+.clue-card.type-evidence {
+  border-left: 3px solid #8b4513;
+}
+
+.clue-card.type-deduction {
+  border-left: 3px solid #8b0000;
+}
+
+.clue-card.type-document {
+  border-left: 3px solid #2d5a27;
+}
+
+.clue-content.clipped {
+  max-height: 4.5em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.connection-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.connection-line {
+  stroke: rgba(139, 0, 0, 0.45);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.board-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #6b5c48;
+  max-width: 320px;
+  z-index: 0;
+}
+
+.board-hint h3 {
+  font-family: var(--font-title);
+}
+
+.toast-stack {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 340px;
+}
+
+.discovery-toast {
+  background: #fffdf7;
+  color: var(--color-text-dark);
+  border-left: 4px solid var(--color-accent);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  animation: slideIn 0.35s ease;
+}
+
+.toast-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+}
+
+.toast-title {
+  font-family: var(--font-title);
+  font-weight: 700;
+  margin: 0.25rem 0;
+}
+
+.discovery-toast p {
+  margin: 0.35rem 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.toast-by {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.accusation-panel h3 {
+  margin-top: 0;
+}
+
+.suspect-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.suspect-btn {
+  text-align: left;
+  padding: 0.75rem !important;
+  font-size: 0.95rem !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-light) !important;
+}
+
+.suspect-btn strong {
+  display: block;
+  font-family: var(--font-title);
+}
+
+.suspect-btn span {
+  font-size: 0.8rem;
+  color: #c9a227;
+}
+
+.suspect-btn small {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #aaa;
+  font-family: var(--font-body);
+}
+
+.suspect-btn.selected {
+  border-color: var(--color-accent) !important;
+  background: rgba(139, 0, 0, 0.2) !important;
+}
+
+.confirm-accuse p {
+  font-size: 0.85rem;
+  color: #ffb4b4;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.confirm-actions button {
+  flex: 1;
+  padding: 0.65rem !important;
+  font-size: 0.95rem !important;
+}
+
+.note-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.note-form input {
+  flex: 1;
+}
+
+.notes-feed {
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.note-item {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.5rem 0.65rem;
+  border-radius: 4px;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.note-item p {
+  margin: 0.2rem 0 0;
+  color: #ddd;
+}
+
+.verdict-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.verdict-card {
+  max-width: 480px;
+  text-align: center;
+}
+
+.verdict-overlay.win .verdict-card h2 {
+  color: #c9a227;
+}
+
+.verdict-overlay.lose .verdict-card h2 {
+  color: #f88;
+}
+
+.verdict-explanation {
+  font-style: italic;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.clue-card {
+  z-index: 2;
+}

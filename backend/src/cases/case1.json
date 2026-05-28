@@ -1,48 +1,91 @@
 {
   "id": "case-crimson-cipher",
   "title": "The Crimson Cipher",
-  "description": "A wealthy art collector was found murdered, and a cryptic cipher was left at the scene. Connect the clues to find the killer.",
+  "description": "Lord Harrington lies dead in his study, a bloody cipher on the wall. Work with your partner to link evidence on the board and unmask the killer before they slip away.",
   "startingClues": ["clue-1", "clue-2"],
   "clues": {
     "clue-1": {
       "id": "clue-1",
       "type": "document",
       "title": "Police Report",
-      "content": "Victim: Lord Harrington. Found dead in his study at 11:00 PM. A window was broken from the inside. A red cipher was written on the wall in blood: 'THE RAVEN FLIES AT MIDNIGHT'.",
-      "image": null
+      "content": "Victim: Lord Harrington. Found dead in his study at 11:00 PM. The window latch was broken from the inside. A crimson cipher on the wall reads: 'THE RAVEN FLIES AT MIDNIGHT'."
     },
     "clue-2": {
       "id": "clue-2",
       "type": "suspect",
       "title": "Suspect: Arthur Penhaligon",
-      "content": "Harrington's nephew. Claims he was at the theater until midnight. Needs verification.",
-      "image": null
+      "content": "The victim's nephew and heir. Claims he was at the Grand Theater until midnight. Known to gamble heavily."
     },
     "clue-3": {
       "id": "clue-3",
       "type": "evidence",
-      "title": "Theater Ticket",
-      "content": "A torn theater ticket for 'The Raven', stamped at 10:30 PM. Found in Arthur's coat.",
-      "image": null
+      "title": "Theater Ticket Stub",
+      "content": "A torn ticket for 'The Raven' at the Grand Theater, stamped 10:30 PM. Found folded inside Arthur's overcoat pocket."
     },
     "clue-4": {
       "id": "clue-4",
       "type": "deduction",
-      "title": "The Nephew's Lie",
-      "content": "Arthur claims he was at the theater until midnight, but 'The Raven' is the cipher. The ticket proves he was there, but it connects him to the message.",
-      "image": null
+      "title": "Cipher Connection",
+      "content": "'The Raven' is both the play Arthur attended and the phrase in the cipher. Arthur had opportunity and a motive tied to the message."
+    },
+    "clue-5": {
+      "id": "clue-5",
+      "type": "evidence",
+      "title": "Debt Ledger",
+      "content": "Harrington's private ledger shows Arthur owed £4,000 due by week's end. A note reads: 'Tell no one or you inherit nothing.'"
+    },
+    "clue-6": {
+      "id": "clue-6",
+      "type": "deduction",
+      "title": "Motive & Means",
+      "content": "Arthur needed the inheritance immediately. The broken inside latch suggests someone the lord trusted was already in the house."
     }
   },
   "combinations": [
     {
       "requires": ["clue-1", "clue-2"],
       "unlocks": "clue-3",
-      "message": "You decided to search Arthur's coat after reading the police report."
+      "message": "You cross-reference Arthur's alibi with the crime scene and search his coat."
     },
     {
       "requires": ["clue-1", "clue-3"],
       "unlocks": "clue-4",
-      "message": "Aha! 'The Raven' is the play Arthur attended. He must be connected to the cipher!"
+      "message": "The play title matches the cipher. Arthur is no mere witness."
+    },
+    {
+      "requires": ["clue-2", "clue-4"],
+      "unlocks": "clue-5",
+      "message": "Digging into family finances reveals crushing debts."
+    },
+    {
+      "requires": ["clue-4", "clue-5"],
+      "unlocks": "clue-6",
+      "message": "Motive and opportunity align. Time to make an accusation."
     }
-  ]
+  ],
+  "suspects": [
+    {
+      "id": "suspect-arthur",
+      "name": "Arthur Penhaligon",
+      "role": "Nephew & heir",
+      "detail": "Gambling debts, shaky alibi, found near the study earlier that evening."
+    },
+    {
+      "id": "suspect-elena",
+      "name": "Elena Voss",
+      "role": "Housekeeper",
+      "detail": "Heard arguing with the lord at 10 PM. Has keys to every room."
+    },
+    {
+      "id": "suspect-crane",
+      "name": "Dr. Reginald Crane",
+      "role": "Family physician",
+      "detail": "Signed the death certificate quickly. Was treating Harrington for heart trouble."
+    }
+  ],
+  "solution": {
+    "culpritId": "suspect-arthur",
+    "requiredClues": ["clue-1", "clue-2", "clue-3", "clue-4", "clue-5", "clue-6"],
+    "explanation": "Arthur Penhaligon forged a theater alibi while leaving the cipher from 'The Raven'. Crushing debt gave him motive; his familiarity with the house explains the inside latch."
+  }
 }
