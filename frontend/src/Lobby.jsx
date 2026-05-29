@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { API_BASE } from './config';
+import Tutorial from './components/Tutorial';
 
 export default function Lobby({ user, onJoinRoom, onLogout, pendingRoomCode }) {
   const [joinCode, setJoinCode] = useState(pendingRoomCode || '');
@@ -11,6 +12,7 @@ export default function Lobby({ user, onJoinRoom, onLogout, pendingRoomCode }) {
   const [creating, setCreating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [lastRoomCode, setLastRoomCode] = useState(null);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/cases`)
@@ -93,18 +95,36 @@ export default function Lobby({ user, onJoinRoom, onLogout, pendingRoomCode }) {
 
   return (
     <div className="lobby-container">
+      {showTutorial && <Tutorial onClose={() => setShowTutorial(false)} />}
+
       <div className="panel auth-form lobby-panel">
         <div className="lobby-header">
           <div>
             <h2>Detective {user.username}</h2>
             <p className="lobby-sub">The Agency — Investigations Desk</p>
           </div>
-          <button type="button" className="secondary" onClick={onLogout}>
-            Logout
-          </button>
+          <div className="lobby-header-actions">
+            <button type="button" className="secondary tutorial-btn" onClick={() => setShowTutorial(true)}>
+              Tutorial
+            </button>
+            <button type="button" className="secondary" onClick={onLogout}>
+              Logout
+            </button>
+          </div>
         </div>
 
         {error && <div className="error-banner">{error}</div>}
+
+        <section className="tutorial-teaser panel-inner">
+          <h3>Detective&apos;s Handbook</h3>
+          <p className="hint">
+            New to The Agency? Learn how leads, the evidence board, deduction challenges,
+            and final accusations work.
+          </p>
+          <button type="button" className="secondary" onClick={() => setShowTutorial(true)}>
+            Open full tutorial
+          </button>
+        </section>
 
         <h3>Choose a case</h3>
         <div className="case-picker">

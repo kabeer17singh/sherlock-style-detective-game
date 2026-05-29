@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { API_BASE } from './config';
+import Tutorial from './components/Tutorial';
 
 export default function Auth({ onLogin }) {
+  const [showTutorial, setShowTutorial] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -32,8 +34,18 @@ export default function Auth({ onLogin }) {
 
   return (
     <div className="auth-container">
+      {showTutorial && <Tutorial onClose={() => setShowTutorial(false)} />}
+
       <div className="panel auth-form">
         <h1 className="auth-title">The Agency</h1>
+        <p className="auth-tagline">Victorian murder mysteries · 10–15 min cases</p>
+        <button
+          type="button"
+          className="secondary tutorial-link-auth"
+          onClick={() => setShowTutorial(true)}
+        >
+          Read the Detective&apos;s Handbook (Tutorial)
+        </button>
         <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
           {error && <div style={{color: 'red', textAlign: 'center'}}>{error}</div>}
           <div className="input-group">

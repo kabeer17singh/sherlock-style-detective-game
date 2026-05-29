@@ -6,7 +6,7 @@ import AccusationPanel from './components/AccusationPanel';
 import DeductionModal from './components/DeductionModal';
 import LeadPanel from './components/LeadPanel';
 import DebriefScreen from './components/DebriefScreen';
-import HowToPlay from './components/HowToPlay';
+import Tutorial from './components/Tutorial';
 
 const COMBO_DISTANCE = 120;
 const HOW_TO_KEY = 'detective-how-to-seen';
@@ -49,7 +49,7 @@ export default function GameBoard({ user, room, onLeave }) {
   const [voteStatus, setVoteStatus] = useState(null);
   const [hint, setHint] = useState(null);
   const [showIntro, setShowIntro] = useState(false);
-  const [showHowTo, setShowHowTo] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [draggingClue, setDraggingClue] = useState(null);
   const [players, setPlayers] = useState([]);
   const [discoveries, setDiscoveries] = useState([]);
@@ -96,7 +96,7 @@ export default function GameBoard({ user, room, onLeave }) {
   }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem(HOW_TO_KEY)) setShowHowTo(true);
+    if (!localStorage.getItem(HOW_TO_KEY)) setShowTutorial(true);
   }, []);
 
   useEffect(() => {
@@ -297,9 +297,9 @@ export default function GameBoard({ user, room, onLeave }) {
 
   const dismissToast = (id) => setDiscoveries((d) => d.filter((t) => t.id !== id));
 
-  const closeHowTo = () => {
+  const closeTutorial = () => {
     localStorage.setItem(HOW_TO_KEY, '1');
-    setShowHowTo(false);
+    setShowTutorial(false);
   };
 
   if (loadError) {
@@ -325,7 +325,7 @@ export default function GameBoard({ user, room, onLeave }) {
 
   return (
     <div className="game-container">
-      {showHowTo && <HowToPlay onClose={closeHowTo} />}
+      {showTutorial && <Tutorial onClose={closeTutorial} />}
 
       {showIntro && caseData.intro && (
         <div className="modal-overlay">
@@ -370,9 +370,19 @@ export default function GameBoard({ user, room, onLeave }) {
               {room.roomCode} · {gameMode === 'solo' ? 'Solo' : 'Co-op'}
             </span>
           </div>
-          <button type="button" className="secondary leave-btn" onClick={onLeave}>
-            Leave
-          </button>
+          <div className="sidebar-actions">
+            <button
+              type="button"
+              className="secondary tutorial-btn-sm"
+              onClick={() => setShowTutorial(true)}
+              title="How to play"
+            >
+              ?
+            </button>
+            <button type="button" className="secondary leave-btn" onClick={onLeave}>
+              Leave
+            </button>
+          </div>
         </div>
 
         {statusMsg && <div className="status-banner">{statusMsg}</div>}
